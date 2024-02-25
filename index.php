@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <title>BWN</title>
-        <link rel="icon" type="image/x-icon" href="https://hpanel.hostinger.com/favicons/hostinger.png">
+        <!-- <link rel="icon" type="image/x-icon" href="https://hpanel.hostinger.com/favicons/hostinger.png"> -->
         <meta charset="utf-8">
         <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
         <meta content="Default page" name="description">
@@ -11,29 +11,31 @@
     <body style="margin:0 auto;">
         <form method="post" action="index.php" style="margin: 0 auto; width:250px; padding: 1rem;">
             <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO...">
-            <input type="submit" value="Enter" name="submit">
+            <input type="submit" value="Enter" name="submit" onclick="setTimeZone()">
         </form>
 
 
         <br>
     </body>
     <?php
+        // Get ICAO from POST variables
         if(isset($_POST['icao'])) {
             $str = $_POST['icao'];
             $pattern = "/([0-9A-Za-z]{4})/";
             
+            // Look for 4-digit/character sequences
             if (preg_match_all($pattern, $str, $matches)) {
-                echo "<table style=\"border: 1px solid black; border-collapse: collapse;\">";
-                foreach($matches[1] as &$value) {
-                    getAHAS($value);
-                }
-                echo "</table>";
                 
+                // AHAS table
+                getAHASALL($matches[1]);
+                
+                // METAR/TAF
                 foreach($matches[1] as &$value) {
                     getMETAR($value);
                     getTAF($value);
                  }
                 
+                // NOTAMS
                 foreach($matches[1] as &$value) {
                      getNOTAMS($value);
                 }
@@ -48,15 +50,16 @@
             // Lookup icao full name
             $icao_full_name =  $json_data[strtoupper($icao)];
             
-            // Replace utf
+            // Replace spaces with "utf" spaces
             $pattern = "/ /";
             $icao_full_name = preg_replace($pattern, "%20", $icao_full_name);
             
-            // get uTC month, day, and hour
+            // Get UTC month, day, and hour
             $month = gmdate("n");
             $day = gmdate("j");
             $hour = gmdate("G");
             
+            // GET request
             $url = "https://www.usahas.com/webservices/Fluffy_AHAS_2023.asmx/GetAHASRisk2023_12?Type=MILAIR&Area=%27" . $icao_full_name . "%27&iMonth=" . $month . "&iDay=" . $day . "&iHour=" . $hour;
             
             $options = [
@@ -68,19 +71,23 @@
             
             $context = stream_context_create($options);
             $result = file_get_contents($url, false, $context);
+            
             if ($result === false) {
                 /* Handle error */
                 echo "uh oh...";
             }
 
-            // remove excess xml and parse
+            // Remove excess xml and parse
             $pattern = "/<diffgr:diffgram[\S\s]*<\/diffgr:diffgram>/";
+            
             if (preg_match_all($pattern, $result, $matches)) {
                 $xml = simplexml_load_string($matches[0][0]);
                 
+                // Build row of AHAS data
                 echo "<tr>";
                 echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . strtoupper($icao) . "</td>";
                 for ($i = 0; $i <= 11; $i++) {
+                    // Get data from xml
                     if($i == 0) {
                         $risk = $xml->NewDataSet->Table->AHASRISK;
                     } else {
@@ -88,6 +95,7 @@
                         $risk = $xml->NewDataSet->$table->AHASRISK;
                     }
                     
+                    // Shorten MODERATE and SEVERE to three letters and set cell background color
                     if($risk == "MODERATE") {
                         $risk = "MOD";
                         $cell_color = "yellow";
@@ -107,6 +115,142 @@
             }
         }
         
+        function getAHASALL($icao_list) {
+            echo "<table style=\"border-collapse: collapse;\">";
+            // Read JSON file
+            $json = file_get_contents('icao.json'); 
+            $json_data = json_decode($json,true); 
+            $ahas_list = array();
+
+            // Lookup, "UTF"-ify, and store ICAO full names
+            foreach($icao_list as $icao) {
+                // Read JSON file
+                $json = file_get_contents('icao.json'); 
+                $json_data = json_decode($json,true); 
+                
+                // Lookup icao full name
+                $icao_full_name =  $json_data[strtoupper($icao)];
+                
+                // Replace spaces with "utf" spaces
+                $pattern = "/ /";
+                $icao_url_full_name = preg_replace($pattern, "%20", $icao_full_name);
+
+                // Add to array
+                array_push($ahas_list, $icao_url_full_name);
+            }
+            
+            // Build AHAS table
+            for ($icao = 0; $icao < count($ahas_list); $icao++) {
+                $xml = getAHASfromXML($ahas_list[$icao]);
+
+                if($icao == 0) {
+                    echo "<tr>";
+                    echo "<td style=\"border: 1px solid black; padding: 0.5rem\"></td>";
+                    
+                    // DateTime row
+                    for($table_index = 0; $table_index <= 11; $table_index++) {
+                        if($table_index == 0) {
+                            $datetime = $xml->NewDataSet->Table->DateTime;
+                        } else {
+                            $table = "Table" . $table_index;
+                            $datetime = $xml->NewDataSet->$table->DateTime;
+                        }
+
+                        // echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . GmtTimeToLocalTime($datetime) . "</td>";
+                        echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . $datetime . "</td>";
+                    }
+                    echo "</tr>";
+
+                    // AHAS risk for first in the list
+                    echo "<tr>";
+                    echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . strtoupper($icao_list[$icao]) . "</td>";
+                    for($table_index = 0; $table_index <= 11; $table_index++) {
+                        if($table_index == 0) {
+                            $ahas_risk = $xml->NewDataSet->Table->AHASRISK;
+                        } else {
+                            $table = "Table" . $table_index;
+                            $ahas_risk = $xml->NewDataSet->$table->AHASRISK;
+                        }
+
+                        // Shorten MODERATE and SEVERE to three letters and set cell background color
+                        if($ahas_risk == "MODERATE") {
+                            $ahas_risk = "MOD";
+                            $cell_color = "yellow";
+                        } else if ($ahas_risk == "SEVERE") {
+                            $ahas_risk = "SEV";
+                            $cell_color = "red";
+                        } else {
+                            $cell_color = "green";
+                        }
+
+                        echo "<td style=\"border: 1px solid black; padding: 0.5rem; background-color: " . $cell_color . ";\">" . $ahas_risk . "</td>";
+                    }
+                    echo "</tr>";
+                } else {
+                    // AHAS risk for the rest of the list
+                    echo "<tr>";
+                    echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . strtoupper($icao_list[$icao]) . "</td>";
+                    for($table_index = 0; $table_index <= 11; $table_index++) {
+                        if($table_index == 0) {
+                            $ahas_risk = $xml->NewDataSet->Table->AHASRISK;
+                        } else {
+                            $table = "Table" . $table_index;
+                            $ahas_risk = $xml->NewDataSet->$table->AHASRISK;
+                        }
+
+                        // Shorten MODERATE and SEVERE to three letters and set cell background color
+                        if($ahas_risk == "MODERATE") {
+                            $ahas_risk = "MOD";
+                            $cell_color = "yellow";
+                        } else if ($ahas_risk == "SEVERE") {
+                            $ahas_risk = "SEV";
+                            $cell_color = "red";
+                        } else {
+                            $cell_color = "green";
+                        }
+
+                        echo "<td style=\"border: 1px solid black; padding: 0.5rem; background-color: " . $cell_color . ";\">" . $ahas_risk . "</td>";
+                    }
+                    echo "</tr>";
+                }
+            }
+            echo "</table>";
+        }
+
+        function getAHASfromXML($icao) {
+            // Get UTC month, day, and hour
+            $month = gmdate("n");
+            $day = gmdate("j");
+            $hour = gmdate("G");
+
+            // GET request
+            $url = "https://www.usahas.com/webservices/Fluffy_AHAS_2023.asmx/GetAHASRisk2023_12?Type=MILAIR&Area=%27" . $icao . "%27&iMonth=" . $month . "&iDay=" . $day . "&iHour=" . $hour;
+                        
+            $options = [
+                'http' => [
+                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                    'method' => 'GET'
+                ],
+            ];
+            
+            $context = stream_context_create($options);
+            $result = file_get_contents($url, false, $context);
+            
+            if ($result === false) {
+                /* Handle error */
+                echo "uh oh...";
+            }
+
+            // Filter unnecessary xml
+            $pattern = "/<diffgr:diffgram[\S\s]*<\/diffgr:diffgram>/";
+            
+            if (preg_match_all($pattern, $result, $matches)) {
+                return simplexml_load_string($matches[0][0]);
+            } else {
+                return null;
+            }
+        }
+
         function getNOTAMS($icao) {
             // POST Request
             $url = "https://www.notams.faa.gov/dinsQueryWeb/queryRetrievalMapAction.do";
@@ -186,5 +330,26 @@
             
             echo "<p>" . $result . "</p>";
         }
+
+        function GmtTimeToLocalTime($time) {
+            date_default_timezone_set('UTC');
+            $new_date = new DateTime($time);
+            $new_date->setTimeZone(new DateTimeZone($_GET["timezone"]));
+            return $new_date->format("Y-m-d h:i:s");
+        }
     ?>
+    <script>
+        function setTimeZone() {
+            const url = new URL(window.location.href);
+            const searchParams = new URLSearchParams(url.search);
+            const new_url = window.location.href + "?timezone=" + Intl.DateTimeFormat().resolvedOptions().timeZone;
+            window.location.assign(new_url); 
+
+            // if(!searchParams.has("timezone")) {
+            //     const new_url = window.location.href + "?timezone=" + Intl.DateTimeFormat().resolvedOptions().timeZone;
+            //     window.location.assign(new_url); 
+            // }
+        }
+
+    </script>
 </html>
