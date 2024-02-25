@@ -11,9 +11,20 @@
     <body style="margin:0 auto;">
         <form method="post" action="index.php" style="margin: 0 auto; width:250px; padding: 1rem;">
             <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO...">
-            <input type="submit" value="Enter" name="submit" onclick="setTimeZone()">
+            <input type="text" id="timezone" name="timezone" hidden>
+            <input type="submit" value="Enter" name="submit">
         </form>
-        <br>
+        <div id="">
+
+        </div>
+        <div id="notams">
+            <input type="checkbox" name="id" id="notam_id_checkbox" checked>
+            <label for="id"> IDs</label>
+            <input type="checkbox" name="valid" id="notam_valid_checkbox" checked>
+            <label for="valid"> Valid</label>
+            <input type="checkbox" name="created" id="notam_created_checkbox" checked>
+            <label for="created"> Created</label>
+        </div>
     </body>
     <?php
         // Get ICAO from POST variables
@@ -81,11 +92,11 @@
                             $datetime = $xml->NewDataSet->$table->DateTime;
                         }
 
-                        $t = strtotime($datetime);
-                        $datetime = date('Hi',$t);
+                        // $t = strtotime($datetime);
+                        // $datetime = date('Hi',$t);
 
-                        // echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . GmtTimeToLocalTime($datetime) . "</td>";
-                        echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . $datetime . "</td>";
+                        echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . GmtTimeToLocalTime($datetime) . "</td>";
+                        // echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . $datetime . "</td>";
                     }
                     echo "</tr>";
 
@@ -208,16 +219,13 @@
             // Pull notams out of PRE tags
             $pattern = "/<PRE>(.*?)<\/PRE>/";
             
-            echo "<p>" . strtoupper($icao) . " NOTAMs:</p>";
             if (preg_match_all($pattern, $str, $matches)) {
                 foreach($matches[1] as &$value) {
-                    echo "<div>" . $value . "</div>";
+                    echo "<div class=\"notam " . $icao . "_notam\" hidden>" . $value . "</div>";
                 }
             } else {
                 echo "no matches found";
             }
-
-            // echo gettype($result);
         }
 
         function getMETAR($icao) {
@@ -237,7 +245,7 @@
                 echo "uh oh...";
             }
             
-            echo "<p class=\"metar\">" . $result . "</p>";
+            echo "<p class=\"metar " . $icao . "_metar\">" . $result . "</p>";
         }
         
         function getTAF($icao) {
@@ -257,28 +265,88 @@
                 echo "uh oh...";
             }
             
-            echo "<p class=\"taf\">" . $result . "</p>";
+            echo "<p class=\"taf " . $icao . "_taf\">" . $result . "</p>";
         }
 
         // Currently unused
         function GmtTimeToLocalTime($time) {
             date_default_timezone_set('UTC');
             $new_date = new DateTime($time);
-            $new_date->setTimeZone(new DateTimeZone($_GET["timezone"]));
-            return $new_date->format("Y-m-d h:i:s");
+            $new_date->setTimeZone(new DateTimeZone($_POST["timezone"]));
+            // $t = strtotime($datetime);
+            // $datetime = date('Hi',$t);
+            return $new_date->format("Hi");
         }
     ?>
     <script>
+        var notam_id_bool = true;
+        var notam_valid_bool = true;
+        var notam_created_bool = true;
+
         window.onload = function () {
+            document.getElementById("notam_id_checkbox").addEventListener("click", toggleNOTAMID);
+            document.getElementById("notam_valid_checkbox").addEventListener("click", toggleNOTAMValid);
+            document.getElementById("notam_created_checkbox").addEventListener("click", toggleNOTAMCreated);
+            
+            document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
             // formatMETARs();
             formatTAFs();
+            rebuildNOTAMs();
+        }
+
+        function toggleNOTAMID() {
+            const notam_id_checkbox = document.getElementById("notam_id_checkbox");
+            var all_notam_ids = document.getElementsByClassName("notam_id");
+            
+            if(!notam_id_checkbox.checked) {
+                for (let i = 0; i < all_notam_ids.length; i++) {
+                    all_notam_ids[i].style.display = "none";
+                }
+            } else {
+                for (let i = 0; i < all_notam_ids.length; i++) {
+                    all_notam_ids[i].style.display = "inline";
+                }
+            }
+        }
+
+        function toggleNOTAMValid() {
+            const notam_valid_checkbox = document.getElementById("notam_valid_checkbox");
+            var all_notam_starts = document.getElementsByClassName("notam_start");
+            var all_notam_ends = document.getElementsByClassName("notam_end");
+            
+            if(!notam_valid_checkbox.checked) {
+                for (let i = 0; i < all_notam_starts.length; i++) {
+                    all_notam_starts[i].style.display = "none";
+                    all_notam_ends[i].style.display = "none";
+                }
+            } else {
+                for (let i = 0; i < all_notam_starts.length; i++) {
+                    all_notam_starts[i].style.display = "inline";
+                    all_notam_ends[i].style.display = "inline";
+                }
+            }
+        }
+
+        function toggleNOTAMCreated() {
+            const notam_created_checkbox = document.getElementById("notam_created_checkbox");
+            var all_notam_createds = document.getElementsByClassName("notam_created");
+            
+            if(!notam_created_checkbox.checked) {
+                for (let i = 0; i < all_notam_createds.length; i++) {
+                    all_notam_createds[i].style.display = "none";
+                }
+            } else {
+                for (let i = 0; i < all_notam_createds.length; i++) {
+                    all_notam_createds[i].style.display = "inline";
+                }
+            }
         }
 
         function formatMETARs() {
             const metars = document.getElementsByClassName("metar");
             
             for (let i = 0; i < metars.length; i++) {
-                console.log(metars[i].innerText);
+                // console.log(metars[i].innerText);
             }
         }
 
@@ -286,21 +354,79 @@
             const tafs = document.getElementsByClassName("taf");
             
             for (let i = 0; i < tafs.length; i++) {
-                console.log(tafs[i].innerText);
+                // console.log(tafs[i].innerText);
             }
         }
 
-        function setTimeZone() {
-            const url = new URL(window.location.href);
-            const searchParams = new URLSearchParams(url.search);
-            const new_url = window.location.href + "?timezone=" + Intl.DateTimeFormat().resolvedOptions().timeZone;
-            window.location.assign(new_url); 
+        function rebuildNOTAMs() {
+            const notam_parent_div = document.getElementById("notams");
+            const all_notams = document.getElementsByClassName("notam");
+            var icao_list = new Set();
 
-            // if(!searchParams.has("timezone")) {
-            //     const new_url = window.location.href + "?timezone=" + Intl.DateTimeFormat().resolvedOptions().timeZone;
-            //     window.location.assign(new_url); 
-            // }
+            // Get list of all icaos
+            for (let i = 0; i < all_notams.length; i++) {
+                var classes = all_notams[i].className.split(" ");
+                icao_list.add(classes[1]);
+            }
+            
+            // Rebuild NOTAMs with buttons
+            icao_list.forEach(function(icao_notam) {
+                // ICAO Title
+                const notam_title = document.createElement("p");
+                notam_title.innerText = icao_notam.split("_")[0].toUpperCase() + " NOTAMs:";
+                notam_parent_div.appendChild(notam_title);
+
+                // NOTAMs for that ICAO
+                const notams = document.getElementsByClassName(icao_notam);
+                for (let i = 0; i < notams.length; i++) {
+                    // Parent div
+                    const notam_div = document.createElement("div");
+                    notam_parent_div.appendChild(notam_div);
+                    
+                    // Hide button
+                    const hide_button = document.createElement("button");
+                    hide_button.innerText = "Hide";
+                    hide_button.onclick = function() { hide_button.parentElement.remove(); };
+                    notam_div.appendChild(hide_button);
+
+                    // NOTAM text
+                    const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
+                    const match = notams[i].innerText.matchAll(re);
+
+                    // JS stuff to create NOTAM elements
+                    const notam_id = document.createElement("div");
+                    const notam_text = document.createElement("div");
+                    const notam_start = document.createElement("div");
+                    const notam_end = document.createElement("div"); 
+                    const notam_created = document.createElement("div");
+                    
+                    for (const match of notams[i].innerText.matchAll(re)) {       
+                        notam_id.innerText = match[1];
+                        notam_text.innerText = match[2];
+                        notam_start.innerText = match[3];
+                        notam_end.innerText = match[4];
+                        notam_created.innerText = match[5];
+                    }
+                    
+                    notam_id.classList.add("notam_id");
+                    notam_text.classList.add("notam_text");
+                    notam_start.classList.add("notam_start");
+                    notam_end.classList.add("notam_end");
+                    notam_created.classList.add("notam_created");
+                                   
+                    notam_id.style.display = "inline";
+                    notam_text.style.display = "inline";
+                    notam_start.style.display = "inline";
+                    notam_end.style.display = "inline";
+                    notam_created.style.display = "inline";
+                    
+                    notam_div.appendChild(notam_id);
+                    notam_div.appendChild(notam_text);
+                    notam_div.appendChild(notam_start);
+                    notam_div.appendChild(notam_end);
+                    notam_div.appendChild(notam_created);
+                }
+            });
         }
-
     </script>
 </html>
