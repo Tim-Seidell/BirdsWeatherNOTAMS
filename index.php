@@ -25,7 +25,7 @@
             if (preg_match_all($pattern, $str, $matches)) {
                 
                 // AHAS table
-                getAHAS($matches[1]);
+                // getAHAS($matches[1]);
                 
                 // METAR/TAF
                 foreach($matches[1] as &$value) {
@@ -269,6 +269,27 @@
         }
     ?>
     <script>
+        window.onload = function () {
+            // formatMETARs();
+            formatTAFs();
+        }
+
+        function formatMETARs() {
+            const metars = document.getElementsByClassName("metar");
+            
+            for (let i = 0; i < metars.length; i++) {
+                console.log(metars[i].innerText);
+            }
+        }
+
+        function formatTAFs() {
+            const tafs = document.getElementsByClassName("taf");
+            
+            for (let i = 0; i < tafs.length; i++) {
+                console.log(tafs[i].innerText);
+            }
+        }
+
         function setTimeZone() {
             const url = new URL(window.location.href);
             const searchParams = new URLSearchParams(url.search);
