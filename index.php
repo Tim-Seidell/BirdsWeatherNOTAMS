@@ -8,6 +8,26 @@
         <meta content="Default page" name="description">
         <meta content="width=device-width, initial-scale=1" name="viewport">
     </head>
+    <style>
+        td {
+            border: 1px solid black;
+            word-wrap: break-word;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        th {
+            border: 1px solid black;
+            word-wrap: break-word;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+    </style>
     <body style="margin:0 auto;">
         <form method="post" action="index.php" style="margin: 0 auto; width:250px; padding: 1rem;">
             <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO...">
@@ -17,11 +37,11 @@
         <div id="birds"></div>
         <div id="weather"></div>
         <div id="notams">
-            <input type="checkbox" name="id" id="notam_id_checkbox" checked>
+            <input type="checkbox" name="id" id="notam_id_checkbox">
             <label for="id"> IDs</label>
             <input type="checkbox" name="valid" id="notam_valid_checkbox" checked>
             <label for="valid"> Valid</label>
-            <input type="checkbox" name="created" id="notam_created_checkbox" checked>
+            <input type="checkbox" name="created" id="notam_created_checkbox">
             <label for="created"> Created</label>
         </div>
     </body>
@@ -82,7 +102,7 @@
 
                 if($icao == 0) {
                     echo "<tr>";
-                    echo "<td style=\"border: 1px solid black; padding: 0.5rem\"></td>";
+                    echo "<td style=\"border: 1px solid black;\"></td>";
                     
                     // DateTime row
                     for($table_index = 0; $table_index <= 11; $table_index++) {
@@ -96,14 +116,14 @@
                         // $t = strtotime($datetime);
                         // $datetime = date('Hi',$t);
 
-                        echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . GmtTimeToLocalTime($datetime) . "</td>";
+                        echo "<td style=\"border: 1px solid black;\">" . GmtTimeToLocalTime($datetime) . "</td>";
                         // echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . $datetime . "</td>";
                     }
                     echo "</tr>";
 
                     // AHAS risk for first in the list
                     echo "<tr>";
-                    echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . strtoupper($icao_list[$icao]) . "</td>";
+                    echo "<td style=\"border: 1px solid black;\">" . strtoupper($icao_list[$icao]) . "</td>";
                     for($table_index = 0; $table_index <= 11; $table_index++) {
                         if($table_index == 0) {
                             $ahas_risk = $xml->NewDataSet->Table->AHASRISK;
@@ -123,13 +143,13 @@
                             $cell_color = "green";
                         }
 
-                        echo "<td style=\"border: 1px solid black; padding: 0.5rem; background-color: " . $cell_color . ";\">" . $ahas_risk . "</td>";
+                        echo "<td style=\"border: 1px solid black; background-color: " . $cell_color . ";\">" . $ahas_risk . "</td>";
                     }
                     echo "</tr>";
                 } else {
                     // AHAS risk for the rest of the list
                     echo "<tr>";
-                    echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . strtoupper($icao_list[$icao]) . "</td>";
+                    echo "<td style=\"border: 1px solid black;\">" . strtoupper($icao_list[$icao]) . "</td>";
                     for($table_index = 0; $table_index <= 11; $table_index++) {
                         if($table_index == 0) {
                             $ahas_risk = $xml->NewDataSet->Table->AHASRISK;
@@ -149,7 +169,7 @@
                             $cell_color = "green";
                         }
 
-                        echo "<td style=\"border: 1px solid black; padding: 0.5rem; background-color: " . $cell_color . ";\">" . $ahas_risk . "</td>";
+                        echo "<td style=\"border: 1px solid black; background-color: " . $cell_color . ";\">" . $ahas_risk . "</td>";
                     }
                     echo "</tr>";
                 }
@@ -293,6 +313,11 @@
             rebuildNOTAMs();
             rebuildWeather();
             rebuildAHAS();
+            // generateTable();
+
+            toggleNOTAMID();
+            toggleNOTAMValid();
+            toggleNOTAMCreated();
         }
 
         function toggleNOTAMID() {
@@ -386,11 +411,11 @@
                     const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
 
                     for (const match of notam.matchAll(re)) {       
-                        notam_id.innerText = match[1];
-                        notam_text.innerText = match[2];
-                        notam_start.innerText = match[3];
-                        notam_end.innerText = match[4];
-                        notam_created.innerText = match[5];
+                        notam_id.innerText = " " + match[1];
+                        notam_text.innerText = " - " + match[2];
+                        notam_start.innerText = " " + match[3];
+                        notam_end.innerText = " - " + match[4];
+                        notam_created.innerText = " Created: " + match[5];
                     }
                     
                     notam_id.classList.add("notam_id");
@@ -441,6 +466,66 @@
             const ahas_div = document.getElementById("birds");
             const ahas_table = document.getElementById("ahas_table");
             ahas_div.appendChild(ahas_table);
+        }
+
+        function generateTable(skip) {
+            // Get all ICAOs searched
+            var all_icao_string = document.getElementById("all_icaos").innerText;
+            all_icao_string = all_icao_string.replace(/\s/g, "");
+            const all_icao = all_icao_string.split(",");
+
+            // Create table
+            const tbl = document.createElement("table");
+            const tblBody = document.createElement("tbody");
+            const th = ["Hide", "ID", "Text", "Start", "End", "Created"];
+
+            // Create Header row
+            const header_row = document.createElement("tr");
+
+            th.forEach(function(header) {
+                const cell = document.createElement("td");
+                const cellText = document.createTextNode(header);
+                cell.className = "notam_" + header.toLowerCase();
+                cell.appendChild(cellText);
+                header_row.appendChild(cell);
+            });
+
+            tblBody.appendChild(header_row);
+
+            // Create rows for all notams
+            all_icao.forEach(function(icao) {
+                const notams = document.getElementsByClassName(icao + "_notam");
+
+                for (let i = 0; i < notams.length; i++) {
+                    const tr = document.createElement("tr");
+                    const notam_array = [];
+                    var notam = notams[i].innerText.replace(/[^\u0000-\u007F]/g, "'");
+                    const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
+
+                    for (const match of notam.matchAll(re)) {  
+                        notam_array.push(match[1], match[2], match[3], match[4], match[5])
+                    }
+
+                    const cell = document.createElement("td");
+                    const hide_button = document.createElement("button");
+                    hide_button.innerText = "Hide";
+                    hide_button.onclick = function() { hide_button.parentElement.parentElement.remove(); };
+                    cell.appendChild(hide_button);
+                    tr.appendChild(cell);
+
+                    for (let i = 0; i < notam_array.length; i++) {
+                        const cell = document.createElement("td");
+                        const cellText = document.createTextNode(notam_array[i]);
+                        cell.className = "notam_" + th[i+1].toLowerCase();
+                        cell.appendChild(cellText);
+                        tr.appendChild(cell);
+                    }
+                    tblBody.appendChild(tr);
+                }
+            });
+
+            tbl.appendChild(tblBody);
+            document.body.appendChild(tbl);
         }
     </script>
 </html>
