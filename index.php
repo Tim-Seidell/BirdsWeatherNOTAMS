@@ -16,6 +16,7 @@
             padding-bottom: 0.25rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
+            text-align: center;
         }
 
         th {
@@ -26,6 +27,7 @@
         table {
             border-collapse: collapse;
             table-layout: fixed;
+            margin: auto;
         }
     </style>
     <body style="margin:0 auto;">
