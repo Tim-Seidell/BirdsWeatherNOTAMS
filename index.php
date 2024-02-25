@@ -13,8 +13,6 @@
             <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO...">
             <input type="submit" value="Enter" name="submit" onclick="setTimeZone()">
         </form>
-
-
         <br>
     </body>
     <?php
@@ -27,7 +25,7 @@
             if (preg_match_all($pattern, $str, $matches)) {
                 
                 // AHAS table
-                getAHASALL($matches[1]);
+                getAHAS($matches[1]);
                 
                 // METAR/TAF
                 foreach($matches[1] as &$value) {
@@ -42,80 +40,7 @@
             }
         } 
         
-        function getAHAS($icao) {
-            // Read JSON file
-            $json = file_get_contents('icao.json'); 
-            $json_data = json_decode($json,true); 
-            
-            // Lookup icao full name
-            $icao_full_name =  $json_data[strtoupper($icao)];
-            
-            // Replace spaces with "utf" spaces
-            $pattern = "/ /";
-            $icao_full_name = preg_replace($pattern, "%20", $icao_full_name);
-            
-            // Get UTC month, day, and hour
-            $month = gmdate("n");
-            $day = gmdate("j");
-            $hour = gmdate("G");
-            
-            // GET request
-            $url = "https://www.usahas.com/webservices/Fluffy_AHAS_2023.asmx/GetAHASRisk2023_12?Type=MILAIR&Area=%27" . $icao_full_name . "%27&iMonth=" . $month . "&iDay=" . $day . "&iHour=" . $hour;
-            
-            $options = [
-                'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method' => 'GET'
-                ],
-            ];
-            
-            $context = stream_context_create($options);
-            $result = file_get_contents($url, false, $context);
-            
-            if ($result === false) {
-                /* Handle error */
-                echo "uh oh...";
-            }
-
-            // Remove excess xml and parse
-            $pattern = "/<diffgr:diffgram[\S\s]*<\/diffgr:diffgram>/";
-            
-            if (preg_match_all($pattern, $result, $matches)) {
-                $xml = simplexml_load_string($matches[0][0]);
-                
-                // Build row of AHAS data
-                echo "<tr>";
-                echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . strtoupper($icao) . "</td>";
-                for ($i = 0; $i <= 11; $i++) {
-                    // Get data from xml
-                    if($i == 0) {
-                        $risk = $xml->NewDataSet->Table->AHASRISK;
-                    } else {
-                        $table = "Table" . $i;
-                        $risk = $xml->NewDataSet->$table->AHASRISK;
-                    }
-                    
-                    // Shorten MODERATE and SEVERE to three letters and set cell background color
-                    if($risk == "MODERATE") {
-                        $risk = "MOD";
-                        $cell_color = "yellow";
-                    } else if ($risk == "SEVERE") {
-                        $risk = "SEV";
-                        $cell_color = "red";
-                    } else {
-                        $cell_color = "green";
-                    }
-                    
-                    echo "<td style=\"border: 1px solid black; padding: 0.5rem; background-color: " . $cell_color . ";\">" . $risk . "</td>";
-                }
-                echo "</tr>";
-                
-            } else {
-                echo "no matches found";
-            }
-        }
-        
-        function getAHASALL($icao_list) {
+        function getAHAS($icao_list) {
             echo "<table style=\"border-collapse: collapse;\">";
             // Read JSON file
             $json = file_get_contents('icao.json'); 
@@ -155,6 +80,9 @@
                             $table = "Table" . $table_index;
                             $datetime = $xml->NewDataSet->$table->DateTime;
                         }
+
+                        $t = strtotime($datetime);
+                        $datetime = date('Hi',$t);
 
                         // echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . GmtTimeToLocalTime($datetime) . "</td>";
                         echo "<td style=\"border: 1px solid black; padding: 0.5rem\">" . $datetime . "</td>";
@@ -217,6 +145,7 @@
             echo "</table>";
         }
 
+        // Helper for getAHAS()
         function getAHASfromXML($icao) {
             // Get UTC month, day, and hour
             $month = gmdate("n");
@@ -308,7 +237,7 @@
                 echo "uh oh...";
             }
             
-            echo "<p>" . $result . "</p>";
+            echo "<p class=\"metar\">" . $result . "</p>";
         }
         
         function getTAF($icao) {
@@ -328,9 +257,10 @@
                 echo "uh oh...";
             }
             
-            echo "<p>" . $result . "</p>";
+            echo "<p class=\"taf\">" . $result . "</p>";
         }
 
+        // Currently unused
         function GmtTimeToLocalTime($time) {
             date_default_timezone_set('UTC');
             $new_date = new DateTime($time);
