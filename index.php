@@ -374,17 +374,18 @@
                     hide_button.onclick = function() { hide_button.parentElement.remove(); };
                     notam_div.appendChild(hide_button);
 
-                    // NOTAM text
-                    const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
-
                     // JS stuff to create NOTAM elements
                     const notam_id = document.createElement("div");
                     const notam_text = document.createElement("div");
                     const notam_start = document.createElement("div");
                     const notam_end = document.createElement("div"); 
                     const notam_created = document.createElement("div");
-                    
-                    for (const match of notams[i].innerText.matchAll(re)) {       
+
+                    // NOTAM text
+                    var notam = notams[i].innerText.replace(/[^\u0000-\u007F]/g, "'");
+                    const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
+
+                    for (const match of notam.matchAll(re)) {       
                         notam_id.innerText = match[1];
                         notam_text.innerText = match[2];
                         notam_start.innerText = match[3];
