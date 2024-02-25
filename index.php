@@ -14,9 +14,8 @@
             <input type="text" id="timezone" name="timezone" hidden>
             <input type="submit" value="Enter" name="submit">
         </form>
-        <div id="">
-
-        </div>
+        <div id="birds"></div>
+        <div id="weather"></div>
         <div id="notams">
             <input type="checkbox" name="id" id="notam_id_checkbox" checked>
             <label for="id"> IDs</label>
@@ -32,11 +31,13 @@
             $str = $_POST['icao'];
             $pattern = "/([0-9A-Za-z]{4})/";
             
+            echo "<p id=\"all_icaos\" hidden>" . $_POST['icao'] . "</p>";
+
             // Look for 4-digit/character sequences
             if (preg_match_all($pattern, $str, $matches)) {
                 
                 // AHAS table
-                // getAHAS($matches[1]);
+                getAHAS($matches[1]);
                 
                 // METAR/TAF
                 foreach($matches[1] as &$value) {
@@ -52,7 +53,7 @@
         } 
         
         function getAHAS($icao_list) {
-            echo "<table style=\"border-collapse: collapse;\">";
+            echo "<table id=\"ahas_table\" style=\"border-collapse: collapse;\">";
             // Read JSON file
             $json = file_get_contents('icao.json'); 
             $json_data = json_decode($json,true); 
@@ -245,7 +246,7 @@
                 echo "uh oh...";
             }
             
-            echo "<p class=\"metar " . $icao . "_metar\">" . $result . "</p>";
+            echo "<p class=\"metar " . $icao . "_metar\" hidden>" . $result . "</p>";
         }
         
         function getTAF($icao) {
@@ -265,7 +266,7 @@
                 echo "uh oh...";
             }
             
-            echo "<p class=\"taf " . $icao . "_taf\">" . $result . "</p>";
+            echo "<p class=\"taf " . $icao . "_taf\" hidden>" . $result . "</p>";
         }
 
         // Currently unused
@@ -279,19 +280,19 @@
         }
     ?>
     <script>
-        var notam_id_bool = true;
-        var notam_valid_bool = true;
-        var notam_created_bool = true;
-
         window.onload = function () {
+            // Timezone
+            document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            // NOTAM settings checkboxes
             document.getElementById("notam_id_checkbox").addEventListener("click", toggleNOTAMID);
             document.getElementById("notam_valid_checkbox").addEventListener("click", toggleNOTAMValid);
             document.getElementById("notam_created_checkbox").addEventListener("click", toggleNOTAMCreated);
             
-            document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            // formatMETARs();
-            formatTAFs();
+            // Functions to run on refresh
             rebuildNOTAMs();
+            rebuildWeather();
+            rebuildAHAS();
         }
 
         function toggleNOTAMID() {
@@ -342,22 +343,6 @@
             }
         }
 
-        function formatMETARs() {
-            const metars = document.getElementsByClassName("metar");
-            
-            for (let i = 0; i < metars.length; i++) {
-                // console.log(metars[i].innerText);
-            }
-        }
-
-        function formatTAFs() {
-            const tafs = document.getElementsByClassName("taf");
-            
-            for (let i = 0; i < tafs.length; i++) {
-                // console.log(tafs[i].innerText);
-            }
-        }
-
         function rebuildNOTAMs() {
             const notam_parent_div = document.getElementById("notams");
             const all_notams = document.getElementsByClassName("notam");
@@ -391,7 +376,6 @@
 
                     // NOTAM text
                     const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
-                    const match = notams[i].innerText.matchAll(re);
 
                     // JS stuff to create NOTAM elements
                     const notam_id = document.createElement("div");
@@ -427,6 +411,35 @@
                     notam_div.appendChild(notam_created);
                 }
             });
+        }
+
+        function rebuildWeather() {
+            const weather_parent_div = document.getElementById("weather");
+            var all_icao_string = document.getElementById("all_icaos").innerText;
+
+            // Remove whitespace and create list
+            all_icao_string = all_icao_string.replace(/\s/g, "");
+            const all_icao = all_icao_string.split(",");
+
+            all_icao.forEach(function(icao) {
+                const icao_weather_title = document.createElement("p");
+                icao_weather_title.innerText = icao.toUpperCase() + " Weather:";
+                weather_parent_div.appendChild(icao_weather_title);
+
+                const icao_metar = document.createElement("p");
+                icao_metar.innerText = document.getElementsByClassName(icao + "_metar")[0].innerText;
+                weather_parent_div.appendChild(icao_metar);
+
+                const icao_taf = document.createElement("p");
+                icao_taf.innerText = document.getElementsByClassName(icao + "_taf")[0].innerText;
+                weather_parent_div.appendChild(icao_taf);
+            });
+        }
+
+        function rebuildAHAS() {
+            const ahas_div = document.getElementById("birds");
+            const ahas_table = document.getElementById("ahas_table");
+            ahas_div.appendChild(ahas_table);
         }
     </script>
 </html>
