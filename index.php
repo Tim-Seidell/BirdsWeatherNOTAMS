@@ -29,6 +29,11 @@
             table-layout: fixed;
             margin: auto;
         }
+
+        .hide-button {
+            height: 3rem;
+            margin: 0.2rem;
+        }
     </style>
     <body style="margin:0 auto;">
         <form method="post" action="index.php" style="margin: 0 auto; width:250px; padding: 1rem;">
@@ -398,6 +403,7 @@
                     // Hide button
                     const hide_button = document.createElement("button");
                     hide_button.innerText = "Hide";
+                    hide_button.className = "hide-button";
                     hide_button.onclick = function() { hide_button.parentElement.remove(); };
                     notam_div.appendChild(hide_button);
 
