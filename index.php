@@ -44,6 +44,8 @@
         <div id="birds"></div>
         <div id="weather"></div>
         <div id="notams">
+            <input type="checkbox" name="hide" id="notam_hide_checkbox" checked>
+            <label for="hide"> Hide</label>
             <input type="checkbox" name="id" id="notam_id_checkbox">
             <label for="id"> IDs</label>
             <input type="checkbox" name="valid" id="notam_valid_checkbox" checked>
@@ -312,6 +314,7 @@
             document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
             // NOTAM settings checkboxes
+            document.getElementById("notam_hide_checkbox").addEventListener("click", toggleNOTAMHide);
             document.getElementById("notam_id_checkbox").addEventListener("click", toggleNOTAMID);
             document.getElementById("notam_valid_checkbox").addEventListener("click", toggleNOTAMValid);
             document.getElementById("notam_created_checkbox").addEventListener("click", toggleNOTAMCreated);
@@ -322,9 +325,25 @@
             rebuildAHAS();
             // generateTable();
 
+            toggleNOTAMHide();
             toggleNOTAMID();
             toggleNOTAMValid();
             toggleNOTAMCreated();
+        }
+
+        function toggleNOTAMHide() {
+            const notam_hide_checkbox = document.getElementById("notam_hide_checkbox");
+            var all_notam_hide_buttons = document.getElementsByClassName("notam-hide");
+            
+            if(!notam_hide_checkbox.checked) {
+                for (let i = 0; i < all_notam_hide_buttons.length; i++) {
+                    all_notam_hide_buttons[i].style.display = "none";
+                }
+            } else {
+                for (let i = 0; i < all_notam_hide_buttons.length; i++) {
+                    all_notam_hide_buttons[i].style.display = "inline";
+                }
+            }
         }
 
         function toggleNOTAMID() {
@@ -403,7 +422,7 @@
                     // Hide button
                     const hide_button = document.createElement("button");
                     hide_button.innerText = "Hide";
-                    hide_button.className = "hide-button";
+                    hide_button.className = "notam-hide hide-button";
                     hide_button.onclick = function() { hide_button.parentElement.remove(); };
                     notam_div.appendChild(hide_button);
 
