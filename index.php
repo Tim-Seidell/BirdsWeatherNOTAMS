@@ -9,6 +9,10 @@
         <meta content="width=device-width, initial-scale=1" name="viewport">
     </head>
     <style>
+        body {
+            touch-action: manipulation;
+        }
+
         td {
             border: 1px solid black;
             word-wrap: break-word;
