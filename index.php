@@ -41,7 +41,7 @@
     </style>
     <body>
         <form method="post" action="index.php" style="margin: 1rem; margin: auto; width: fit-content;">
-            <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO..." style="font-size: 18px;" autocapitalize="off">
+            <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO..." style="font-size: 18px;" autocapitalize="off" spellcheck="false">
             <input type="text" id="timezone" name="timezone" hidden>
             <input type="submit" value="Enter" name="submit" style="font-size: 18px;">
         </form>
