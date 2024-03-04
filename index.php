@@ -41,9 +41,9 @@
     </style>
     <body style="margin:0 auto;">
         <form method="post" action="index.php" style="margin: 0 auto; width: 300px; padding: 1rem;">
-            <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO..." style="font-size: 18px; display: inline;">
+            <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO..." style="font-size: 18px;">
             <input type="text" id="timezone" name="timezone" hidden>
-            <input type="submit" value="Enter" name="submit" style="font-size: 18px; display: inline;">
+            <input type="submit" value="Enter" name="submit" style="font-size: 18px;">
         </form>
         <div id="birds"></div>
         <div id="weather"></div>
