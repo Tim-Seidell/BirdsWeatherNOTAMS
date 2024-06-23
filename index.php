@@ -1,61 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
     <head>
         <title>BWN</title>
-        <!-- <link rel="icon" type="image/x-icon" href="https://hpanel.hostinger.com/favicons/hostinger.png"> -->
+        <link rel="stylesheet" href="custom.css">
         <meta charset="utf-8">
         <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
         <meta content="Default page" name="description">
         <meta content="width=device-width, initial-scale=1" name="viewport">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     </head>
-    <style>
-        body {
-            touch-action: manipulation;
-        }
-
-        td {
-            border: 1px solid black;
-            word-wrap: break-word;
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-            text-align: center;
-        }
-
-        th {
-            border: 1px solid black;
-            word-wrap: break-word;
-        }
-
-        table {
-            border-collapse: collapse;
-            table-layout: fixed;
-            margin: auto;
-        }
-
-        .hide-button {
-            height: 3rem;
-            margin: 0.2rem;
-        }
-    </style>
     <body>
-        <form method="post" action="index.php" style="margin: 1rem; margin: auto; width: fit-content;">
-            <input type="text" name="icao" placeholder="ICAO, ICAO, ICAO..." style="font-size: 18px;" autocapitalize="off" spellcheck="false">
-            <input type="text" id="timezone" name="timezone" hidden>
-            <input type="submit" value="Enter" name="submit" style="font-size: 18px;">
-        </form>
+        <!-- Nav bar -->
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">BWN</a>
+                <form class="d-flex" role="search" method="post" action="index.php" style="margin: 1rem; margin: auto; width: fit-content;">
+                    <input class="form-control me-2" type="search" aria-label="Search" name="icao" placeholder="ICAO, ICAO, ICAO..." style="text-transform:uppercase">
+                    <input type="text" id="timezone" name="timezone" hidden>
+                    <button class="btn btn-outline-success" type="submit" name="submit">Search</button>
+                </form>
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" id="btnSwitch">Dark mode</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Link</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#">Action</a></li>
+                                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                                    <li><hr class="dropdown-divider">
+                                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <form class="d-flex mt-3" role="search">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hidden example container -->
+        <div class="container text-center bg-dark-subtle border rounded mt-4 pb-2" id="ICAO_card" hidden>
+            <div class="row">
+                <div class="col border-bottom editable" id="ICAO_title">ZZZZ - ZZZZ</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-1 border-bottom text-center" style="display: flex; align-items: center; flex-wrap: wrap;">AHAS</div>
+                <div class="col-sm-11">
+                    <div class="row">
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_1">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_2">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_3">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_4">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_5">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_6">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_7">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_8">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_9">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_10">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_11">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_12">ZZZZ</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_1">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_2">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_3">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_4">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_5">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_6">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_7">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_8">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_9">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_10">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_11">ZZZZ</div>
+                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_12">ZZZZ</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-start">
+                <div class="col border-bottom" style="width: 100%">METAR</div>
+            </div>
+                <div class="row text-start">
+                    <div class="col border-bottom editable" id="ICAO_metar">ZZZZ</div>
+                </div>
+                <div class="row text-start">
+                    <div class="col border-bottom">TAF</div>
+                </div>
+                <div class="row text-start">
+                    <div class="col border-bottom editable" id="ICAO_taf">ZZZZ</div>
+                </div>
+                <div class="row text-start">
+                    <div class="col border-bottom">NOTAMs</div>
+                </div>
+                <div class="row text-start">
+                    <div class="col border-bottom">
+                        <div class="editable" id="ICAO_notams"></div>
+                    </div>
+                </div>
+                <div class="accordion mt-2" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Hidden NOTAMs
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <div class="editable" id="ICAO_hidden_notams"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <!-- Hidden API data elements -->
         <div id="birds"></div>
         <div id="weather"></div>
         <div id="notams">
-            <input type="checkbox" name="hide" id="notam_hide_checkbox" checked>
-            <label for="hide"> Hide</label>
-            <input type="checkbox" name="id" id="notam_id_checkbox">
-            <label for="id"> IDs</label>
-            <input type="checkbox" name="valid" id="notam_valid_checkbox" checked>
-            <label for="valid"> Valid</label>
-            <input type="checkbox" name="created" id="notam_created_checkbox">
-            <label for="created"> Created</label>
+            <!-- Settings for configuring notams -->
+            <div id="notam_settings" hidden>
+                <input type="checkbox" name="hide" id="notam_hide_checkbox" checked>
+                <label for="hide"> Hide</label>
+                <input type="checkbox" name="id" id="notam_id_checkbox">
+                <label for="id"> IDs</label>
+                <input type="checkbox" name="valid" id="notam_valid_checkbox" checked>
+                <label for="valid"> Valid</label>
+                <input type="checkbox" name="created" id="notam_created_checkbox">
+                <label for="created"> Created</label>
+            </div>
         </div>
     </body>
     <?php
@@ -152,7 +239,7 @@
                         } else if ($ahas_risk == "SEVERE") {
                             $ahas_risk = "SEV";
                             $cell_color = "red";
-                        } else {
+                        } else if ($ahas_risk == "LOW"){
                             $cell_color = "green";
                         }
 
@@ -312,251 +399,7 @@
             return $new_date->format("Hi");
         }
     ?>
-    <script>
-        window.onload = function () {
-            // Timezone
-            document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-            // NOTAM settings checkboxes
-            document.getElementById("notam_hide_checkbox").addEventListener("click", toggleNOTAMHide);
-            document.getElementById("notam_id_checkbox").addEventListener("click", toggleNOTAMID);
-            document.getElementById("notam_valid_checkbox").addEventListener("click", toggleNOTAMValid);
-            document.getElementById("notam_created_checkbox").addEventListener("click", toggleNOTAMCreated);
-            
-            // Functions to run on refresh
-            rebuildNOTAMs();
-            rebuildWeather();
-            rebuildAHAS();
-            // generateTable();
-
-            toggleNOTAMHide();
-            toggleNOTAMID();
-            toggleNOTAMValid();
-            toggleNOTAMCreated();
-        }
-
-        function toggleNOTAMHide() {
-            const notam_hide_checkbox = document.getElementById("notam_hide_checkbox");
-            var all_notam_hide_buttons = document.getElementsByClassName("notam-hide");
-            
-            if(!notam_hide_checkbox.checked) {
-                for (let i = 0; i < all_notam_hide_buttons.length; i++) {
-                    all_notam_hide_buttons[i].style.display = "none";
-                }
-            } else {
-                for (let i = 0; i < all_notam_hide_buttons.length; i++) {
-                    all_notam_hide_buttons[i].style.display = "inline";
-                }
-            }
-        }
-
-        function toggleNOTAMID() {
-            const notam_id_checkbox = document.getElementById("notam_id_checkbox");
-            var all_notam_ids = document.getElementsByClassName("notam_id");
-            
-            if(!notam_id_checkbox.checked) {
-                for (let i = 0; i < all_notam_ids.length; i++) {
-                    all_notam_ids[i].style.display = "none";
-                }
-            } else {
-                for (let i = 0; i < all_notam_ids.length; i++) {
-                    all_notam_ids[i].style.display = "inline";
-                }
-            }
-        }
-
-        function toggleNOTAMValid() {
-            const notam_valid_checkbox = document.getElementById("notam_valid_checkbox");
-            var all_notam_starts = document.getElementsByClassName("notam_start");
-            var all_notam_ends = document.getElementsByClassName("notam_end");
-            
-            if(!notam_valid_checkbox.checked) {
-                for (let i = 0; i < all_notam_starts.length; i++) {
-                    all_notam_starts[i].style.display = "none";
-                    all_notam_ends[i].style.display = "none";
-                }
-            } else {
-                for (let i = 0; i < all_notam_starts.length; i++) {
-                    all_notam_starts[i].style.display = "inline";
-                    all_notam_ends[i].style.display = "inline";
-                }
-            }
-        }
-
-        function toggleNOTAMCreated() {
-            const notam_created_checkbox = document.getElementById("notam_created_checkbox");
-            var all_notam_createds = document.getElementsByClassName("notam_created");
-            
-            if(!notam_created_checkbox.checked) {
-                for (let i = 0; i < all_notam_createds.length; i++) {
-                    all_notam_createds[i].style.display = "none";
-                }
-            } else {
-                for (let i = 0; i < all_notam_createds.length; i++) {
-                    all_notam_createds[i].style.display = "inline";
-                }
-            }
-        }
-
-        function rebuildNOTAMs() {
-            const notam_parent_div = document.getElementById("notams");
-            const all_notams = document.getElementsByClassName("notam");
-            var icao_list = new Set();
-
-            // Get list of all icaos
-            for (let i = 0; i < all_notams.length; i++) {
-                var classes = all_notams[i].className.split(" ");
-                icao_list.add(classes[1]);
-            }
-            
-            // Rebuild NOTAMs with buttons
-            icao_list.forEach(function(icao_notam) {
-                // ICAO Title
-                const notam_title = document.createElement("p");
-                notam_title.innerText = icao_notam.split("_")[0].toUpperCase() + " NOTAMs:";
-                notam_parent_div.appendChild(notam_title);
-
-                // NOTAMs for that ICAO
-                const notams = document.getElementsByClassName(icao_notam);
-                for (let i = 0; i < notams.length; i++) {
-                    // Parent div
-                    const notam_div = document.createElement("div");
-                    notam_parent_div.appendChild(notam_div);
-                    
-                    // Hide button
-                    const hide_button = document.createElement("button");
-                    hide_button.innerText = "Hide";
-                    hide_button.className = "notam-hide hide-button";
-                    hide_button.onclick = function() { hide_button.parentElement.remove(); };
-                    notam_div.appendChild(hide_button);
-
-                    // JS stuff to create NOTAM elements
-                    const notam_id = document.createElement("div");
-                    const notam_text = document.createElement("div");
-                    const notam_start = document.createElement("div");
-                    const notam_end = document.createElement("div"); 
-                    const notam_created = document.createElement("div");
-
-                    // NOTAM text
-                    var notam = notams[i].innerText.replace(/[^\u0000-\u007F]/g, "'");
-                    const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
-
-                    for (const match of notam.matchAll(re)) {       
-                        notam_id.innerText = " " + match[1];
-                        notam_text.innerText = " - " + match[2];
-                        notam_start.innerText = " " + match[3];
-                        notam_end.innerText = " - " + match[4];
-                        notam_created.innerText = " Created: " + match[5];
-                    }
-                    
-                    notam_id.classList.add("notam_id");
-                    notam_text.classList.add("notam_text");
-                    notam_start.classList.add("notam_start");
-                    notam_end.classList.add("notam_end");
-                    notam_created.classList.add("notam_created");
-                                   
-                    notam_id.style.display = "inline";
-                    notam_text.style.display = "inline";
-                    notam_start.style.display = "inline";
-                    notam_end.style.display = "inline";
-                    notam_created.style.display = "inline";
-                    
-                    notam_div.appendChild(notam_id);
-                    notam_div.appendChild(notam_text);
-                    notam_div.appendChild(notam_start);
-                    notam_div.appendChild(notam_end);
-                    notam_div.appendChild(notam_created);
-                }
-            });
-        }
-
-        function rebuildWeather() {
-            const weather_parent_div = document.getElementById("weather");
-            var all_icao_string = document.getElementById("all_icaos").innerText;
-
-            // Remove whitespace and create list
-            all_icao_string = all_icao_string.replace(/\s/g, "");
-            const all_icao = all_icao_string.split(",");
-
-            all_icao.forEach(function(icao) {
-                const icao_weather_title = document.createElement("p");
-                icao_weather_title.innerText = icao.toUpperCase() + " Weather:";
-                weather_parent_div.appendChild(icao_weather_title);
-
-                const icao_metar = document.createElement("p");
-                icao_metar.innerText = document.getElementsByClassName(icao + "_metar")[0].innerText;
-                weather_parent_div.appendChild(icao_metar);
-
-                const icao_taf = document.createElement("p");
-                icao_taf.innerText = document.getElementsByClassName(icao + "_taf")[0].innerText;
-                weather_parent_div.appendChild(icao_taf);
-            });
-        }
-
-        function rebuildAHAS() {
-            const ahas_div = document.getElementById("birds");
-            const ahas_table = document.getElementById("ahas_table");
-            ahas_div.appendChild(ahas_table);
-        }
-
-        function generateTable(skip) {
-            // Get all ICAOs searched
-            var all_icao_string = document.getElementById("all_icaos").innerText;
-            all_icao_string = all_icao_string.replace(/\s/g, "");
-            const all_icao = all_icao_string.split(",");
-
-            // Create table
-            const tbl = document.createElement("table");
-            const tblBody = document.createElement("tbody");
-            const th = ["Hide", "ID", "Text", "Start", "End", "Created"];
-
-            // Create Header row
-            const header_row = document.createElement("tr");
-
-            th.forEach(function(header) {
-                const cell = document.createElement("td");
-                const cellText = document.createTextNode(header);
-                cell.className = "notam_" + header.toLowerCase();
-                cell.appendChild(cellText);
-                header_row.appendChild(cell);
-            });
-
-            tblBody.appendChild(header_row);
-
-            // Create rows for all notams
-            all_icao.forEach(function(icao) {
-                const notams = document.getElementsByClassName(icao + "_notam");
-
-                for (let i = 0; i < notams.length; i++) {
-                    const tr = document.createElement("tr");
-                    const notam_array = [];
-                    var notam = notams[i].innerText.replace(/[^\u0000-\u007F]/g, "'");
-                    const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
-
-                    for (const match of notam.matchAll(re)) {  
-                        notam_array.push(match[1], match[2], match[3], match[4], match[5])
-                    }
-
-                    const cell = document.createElement("td");
-                    const hide_button = document.createElement("button");
-                    hide_button.innerText = "Hide";
-                    hide_button.onclick = function() { hide_button.parentElement.parentElement.remove(); };
-                    cell.appendChild(hide_button);
-                    tr.appendChild(cell);
-
-                    for (let i = 0; i < notam_array.length; i++) {
-                        const cell = document.createElement("td");
-                        const cellText = document.createTextNode(notam_array[i]);
-                        cell.className = "notam_" + th[i+1].toLowerCase();
-                        cell.appendChild(cellText);
-                        tr.appendChild(cell);
-                    }
-                    tblBody.appendChild(tr);
-                }
-            });
-
-            tbl.appendChild(tblBody);
-            document.body.appendChild(tbl);
-        }
-    </script>
+    <script type="text/javascript" src="icao.json"></script>
+    <script src="bwn.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </html>

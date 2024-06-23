@@ -1,0 +1,29 @@
+body {
+    touch-action: manipulation;
+}
+
+td {
+    border: 1px solid black;
+    word-wrap: break-word;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    text-align: center;
+}
+
+th {
+    border: 1px solid black;
+    word-wrap: break-word;
+}
+
+table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin: auto;
+}
+
+.hide-button {
+    height: 3rem;
+    margin: 0.2rem;
+}
