@@ -73,8 +73,8 @@
             </div>
         </nav>
 
-        <!-- Hidden example container -->
-        <div class="container text-center bg-dark-subtle border rounded mt-4 pb-2" id="ICAO_card" hidden>
+        <!-- Hidden example container mt-4 pb-2 -->
+        <div class="container text-center bg-dark-subtle border rounded" id="ICAO_card" hidden>
             <div class="row">
                 <div class="col border-bottom editable fs-2" id="ICAO_title">ZZZZ - ZZZZ</div>
             </div>
