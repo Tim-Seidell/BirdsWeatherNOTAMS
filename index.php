@@ -79,7 +79,7 @@
                 <div class="col border-bottom editable fs-2" id="ICAO_title">ZZZZ - ZZZZ</div>
             </div>
             <div class="row">
-                <div class="col-sm-1 border-bottom text-center align-middle pe-2" style="display: flex; align-items: center; flex-wrap: wrap;"><strong>AHAS</strong></div>
+                <div class="col-sm-1 border-bottom text-center p-0 pt-3"><strong>AHAS</strong></div>
                 <div class="col-sm-11">
                     <div class="row">
                         <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_1">ZZZZ</div>
