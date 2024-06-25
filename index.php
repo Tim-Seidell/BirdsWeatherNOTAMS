@@ -14,15 +14,15 @@
     </head>
     <body>
         <!-- Nav bar -->
-        <nav class="navbar bg-body-tertiary">
+        <nav class="navbar sticky-top bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand" href="https://www.uptbwn.com">BWN</a>
-                <form class="d-flex" role="search" method="post" action="index.php" style="margin: 1rem; margin: auto; width: fit-content;">
-                    <input class="form-control me-2" type="search" aria-label="Search" name="icao" placeholder="ICAO, ICAO, ICAO..." style="text-transform:uppercase">
+                <a class="navbar-brand me-1" href="https://www.uptbwn.com">BWN</a>
+                <form class="d-flex" role="search" method="post" action="index.php">
+                    <input class="form-control me-1" type="search" aria-label="Search" name="icao" placeholder="ICAO, ICAO, ICAO..." style="text-transform:uppercase;">
                     <input type="text" id="timezone" name="timezone" hidden>
-                    <button class="btn btn-outline-success" type="submit" name="submit">Search</button>
+                    <button class="btn btn-outline-success px-2" type="submit" name="submit">Go</button>
                 </form>
-                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                <button class="navbar-toggler px-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -34,7 +34,6 @@
                         <span class="navbar-text fs-3">Appearance</span>
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                             <li class="nav-item">
-                                <!-- <a class="nav-link active" aria-current="page" id="btnSwitch">Dark mode</a> -->
                                 <div class="form-check form-switch">
                                     <input class="form-check-input fs-4" type="checkbox" name="hide" id="btnSwitch" checked>
                                     <label class="form-check-label fs-4" for="btnSwitch">Dark Mode</label>
@@ -75,88 +74,98 @@
 
         <!-- Hidden example container -->
         <div class="container-fluid text-center bg-dark-subtle border rounded mt-4 pb-2" style="width: 95%" id="ICAO_card" hidden>
+            <!-- Title -->
             <div class="row">
                 <div class="col border-bottom editable fs-2" id="ICAO_title">ZZZZ - ZZZZ</div>
             </div>
+            <!-- AHAS -->
             <div class="row">
                 <div class="col-sm-1 border-bottom text-center p-0 pt-3"><strong>AHAS</strong></div>
                 <div class="col-sm-11">
                     <div class="row">
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_1">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_2">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_3">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_4">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_5">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_6">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_7">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_8">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_9">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_10">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_11">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_time_12">ZZZZ</div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_1">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_2">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_3">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_4">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_5">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_6">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_7">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_8">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_9">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_10">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_11">ZZZZ</div>
-                        <div class="col-sm-1 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_12">ZZZZ</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row text-start">
-                <div class="col border-bottom fs-5" style="width: 100%"><strong>METAR</strong></div>
-            </div>
-                <div class="row text-start">
-                    <div class="col border-bottom editable ps-5" id="ICAO_metar">ZZZZ</div>
-                </div>
-                <div class="row text-start">
-                    <div class="col border-bottom fs-5"><strong>TAF</strong></div>
-                </div>
-                <div class="row text-start">
-                    <div class="col border-bottom editable ps-5" id="ICAO_taf">ZZZZ</div>
-                </div>
-                <div class="row text-start">
-                    <div class="col border-bottom fs-5"><strong>NOTAMs</strong></div>
-                </div>
-                <div class="row text-start">
-                    <div class="col border-bottom">
-                        <div class="editable pt-2" id="ICAO_notams"></div>
-                    </div>
-                </div>
-
-                <!-- <p class="d-inline-flex gap-1">
-                    <a class="btn btn-primary editable" data-bs-toggle="collapse" href="#ICAOcollapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        Hidden NOTAMs
-                    </a>
-                </p>
-                    <div class="collapse editable" id="ICAOcollapseExample">
-                    <div class="card card-body">
-                        Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
-                    </div>
-                </div> -->
-
-                <div class="accordion mt-2" id="accordionExample">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Hidden NOTAMs
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <div class="editable text-start" id="ICAO_hidden_notams"></div>
+                        <div class="col-sm-4">
+                            <div class="row">
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_1">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_2">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_3">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_4">ZZZZ</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_1">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_2">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_3">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_4">ZZZZ</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row">
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_5">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_6">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_7">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_8">ZZZZ</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_5">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_6">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_7">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_8">ZZZZ</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="row">
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_9">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_10">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_11">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_time_12">ZZZZ</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_9">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_10">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_11">ZZZZ</div>
+                                <div class="col-3 border-bottom border-start p-0 editable" id="ICAO_ahas_risk_12">ZZZZ</div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <!-- METAR -->
+            <div class="row text-start">
+                <div class="col border-bottom fs-5" style="width: 100%"><strong>METAR</strong><span class="editable" id="ICAO_metar_stats"></span></div>
+            </div>
+            <div class="row text-start">
+                <div class="col border-bottom editable ps-5" id="ICAO_metar">ZZZZ</div>
+            </div>
+            <!-- TAF -->
+            <div class="row text-start">
+                <div class="col border-bottom fs-5"><strong>TAF</strong></div>
+            </div>
+            <div class="row text-start">
+                <div class="col border-bottom editable ps-5" id="ICAO_taf">ZZZZ</div>
+            </div>
+            <!-- NOTAMs -->
+            <div class="row text-start">
+                <div class="col border-bottom fs-5"><strong>NOTAMs</strong></div>
+            </div>
+            <div class="row text-start">
+                <div class="col border-bottom">
+                    <div class="editable pt-2" id="ICAO_notams"></div>
+                </div>
+            </div>
+            <!-- Hidden NOTAMs -->
+            <div class="accordion mt-2" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Hidden NOTAMs
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="editable text-start" id="ICAO_hidden_notams"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Hidden API data elements -->

@@ -1,27 +1,29 @@
-window.onload = function () {
+// Timezone
+document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // Timezone
-    document.getElementById('timezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+// NOTAM settings checkboxes
+document.getElementById("notam_hide_checkbox").addEventListener("click", toggleNOTAMHide);
+document.getElementById("notam_id_checkbox").addEventListener("click", toggleNOTAMID);
+document.getElementById("notam_valid_checkbox").addEventListener("click", toggleNOTAMValid);
+document.getElementById("notam_created_checkbox").addEventListener("click", toggleNOTAMCreated);
 
-    // NOTAM settings checkboxes
-    document.getElementById("notam_hide_checkbox").addEventListener("click", toggleNOTAMHide);
-    document.getElementById("notam_id_checkbox").addEventListener("click", toggleNOTAMID);
-    document.getElementById("notam_valid_checkbox").addEventListener("click", toggleNOTAMValid);
-    document.getElementById("notam_created_checkbox").addEventListener("click", toggleNOTAMCreated);
-    
-    // Functions to run on refresh
-    // rebuildNOTAMs();
-    // rebuildWeather();
-    // rebuildAHAS();
-    // generateTable();
+toggleNOTAMHide();
+toggleNOTAMID();
+toggleNOTAMValid();
+toggleNOTAMCreated();
 
-    toggleNOTAMHide();
-    toggleNOTAMID();
-    toggleNOTAMValid();
-    toggleNOTAMCreated();
+buildCards();
 
-    buildCards();
-}
+document.getElementById('btnSwitch').addEventListener('click',()=>{
+    const dark_mode_switch = document.getElementById("btnSwitch");
+
+    if (dark_mode_switch.checked) {
+        document.documentElement.setAttribute('data-bs-theme','dark')
+    }
+    else {
+        document.documentElement.setAttribute('data-bs-theme','light')
+    }
+})
 
 function toggleNOTAMHide() {
     const notam_hide_checkbox = document.getElementById("notam_hide_checkbox");
@@ -132,12 +134,54 @@ function buildCards() {
         // Insert METARs
         var metar_data = document.getElementsByClassName(icao + "_metar")[0].innerText;
         const metar_display = document.getElementById(icao + "_metar");
+
+            // Print "NO DATA" if no METAR is reported
         if(metar_data == "") {
             metar_data = "NO DATA";
         }
         metar_display.innerText = metar_data;
 
+            // Enhanced SA from METAR
+        const metar_stats_display = document.getElementById(icao + "_metar_stats");
+        const re = /([A-Z]{4})* ([0-9]{2})([0-9]{4})Z (AUTO )*(?:([0-9]{3})([0-9]{2})KT|([0-9]{3})([0-9]{2})G([0-9]{2})KT|VRB([0-9]{2})KT) (?:([0-9]{3})V([0-9]{3}) )?([0-9]{2})SM (?:([A-Z]{3}(?:[0-9]{3})?) )?(?:([A-Z]{3}(?:[0-9]{3})?) )?(?:([A-Z]{3}(?:[0-9]{3})?) )?(?:([A-Z]{3}(?:[0-9]{3})?) )?(?:([A-Z]{3}(?:[0-9]{3})?) )?(?:([A-Z]{3}(?:[0-9]{3})?) )?([0-9]{2})\/([0-9]{2}) A([0-9]{4})/gm;
+
+
+        /* The abomination of a regex above, captures the following groups from a METAR:
+        *   1 - Station identifier
+        *   2 - Number the day of the month
+        *   3 - UTC time of observation
+        *   4 - AUTO generated
+        *   5-6 - Wind direction and speed (14010KT)
+        *   7-9 - Wind direction, speed, and gust (14010G15KT)
+        *   10 - Variable wind speed (VRB05KT)
+        *   11-12 - Varying wind directions (130V310)
+        *   13 - Visibility (currently doesn't support fractions)
+        *   14-19 - Cloud layers
+        *   20 - Temperature (C)
+        *   21 - Dew Point (C)
+        *   22 - Altimeter setting 
+        */
+        var metar_tokens = [...metar_data.matchAll(re)];
+        metar_tokens = metar_tokens[0];
+        const observation_date = metar_tokens[2];
+        const observation_hour = metar_tokens[3].slice(0,2);
+        const observation_minute = metar_tokens[3].slice(2);
+
+        const observation_time = new Date();
+        const current_time = new Date();
+        observation_time.setUTCDate(observation_date);
+        observation_time.setUTCHours(observation_hour);
+        observation_time.setUTCMinutes(observation_minute);
+        observation_time.setSeconds(0);
+        observation_time.setMilliseconds(0);
+
+        const time_since_observation = Math.round((current_time - observation_time) / 1000 / 60);
+        console.log(time_since_observation + " min ago");
+        metar_stats_display.innerText = " (" + time_since_observation + " min ago)";
+
         // Insert TAFs
+                // Regex to match all new lines
+                // ^(?:.*?\b(max\d+)\b)?.*
         var taf_data = document.getElementsByClassName(icao + "_taf")[0].innerText;
         const taf_display = document.getElementById(icao + "_taf");
         if(taf_data == "") {
@@ -161,7 +205,7 @@ function buildCards() {
             hide_button.style.display = "inline";
             hide_button.innerText = "Hide";
             hide_button.innerHTML = "<i class=\"fa-regular fa-eye-slash fs-3\"></i>";
-            hide_button.className = "notam-hide col";
+            hide_button.className = "notam-hide col-1";
             hide_button.onclick = function() {
                 if(notam_div.parentNode.id == icao + "_notams") {
                     hidden_notam_display.appendChild(notam_div);
@@ -193,7 +237,7 @@ function buildCards() {
                 notam_created.innerText = " Created: " + match[5];
             }
      
-            full_notam.classList.add("col-sm-11");
+            full_notam.classList.add("col-11");
             notam_id.classList.add("notam_id");
             notam_text.classList.add("notam_text");
             notam_start.classList.add("notam_start");
@@ -235,174 +279,88 @@ function copyTemplate(icao) {
     document.body.appendChild(new_card);
 }
 
-function rebuildNOTAMs() {
-    const notam_parent_div = document.getElementById("notams");
-    const all_notams = document.getElementsByClassName("notam");
-    var icao_list = new Set();
+// function fits(temperature, dewpoint) {
 
-    // Get list of all icaos
-    for (let i = 0; i < all_notams.length; i++) {
-        var classes = all_notams[i].className.split(" ");
-        icao_list.add(classes[1]);
+//     // https://static.e-publishing.af.mil/production/1/af_sg/publication/dafi48-151/dafi48-151.pdf
+//     const fits_table = [
+//         [-1,-1,-1,-1,-1,82,83,84,86,87,88,90,91,92,94,95,96,98,99],
+//         [-1,-1,-1,-1,-1,82,83,85,86,87,89,90,91,93,94,95,96,98,99],
+//         [-1,-1,-1,-1,-1,82,83,85,86,87,89,90,91,93,94,95,97,98,99],
+//         [-1,-1,-1,-1,-1,82,84,85,86,88,89,90,92,93,94,96,97,98,99],
+//         [-1,-1,-1,-1,-1,83,84,85,87,88,89,91,92,93,95,96,97,98,100],
+//         [-1,-1,-1,-1,-1,83,84,85,87,88,90,91,92,93,95,96,97,99,100],
+//         [76,77,79,80,82,83,84,86,87,88,90,91,92,94,95,96,98,99,100],
+//         [76,78,79,81,82,83,84,86,87,88,90,91,93,94,95,97,98,99,100],
+//         [77,78,80,81,82,84,85,86,87,88,90,92,93,94,96,97,98,99,101],
+//         [77,79,80,81,83,84,85,87,88,89,91,92,93,95,96,97,98,99,101],
+//         [77,79,80,81,83,84,85,87,88,89,91,92,94,95,96,97,98,99,101],
+//         [78,79,80,81,83,84,85,87,88,89,91,92,94,95,96,97,98,99,101],
+//         [79,80,81,82,83,85,86,87,88,90,91,93,94,95,96,98,99,100,102],
+//         [79,],
+//         [80,],
+//         [81,],
+//         [81,],
+//         [82,],
+//         [82,],
+//         [83,],
+//         [84,],
+//         [84,],
+//         [84,],
+//         [85,],
+//         [86,],
+//         [87,],
+//         [88,],
+//         [89,],
+//         [90,],
+//         [91,],
+//         [92,],
+//         [93,],
+//         [94,],
+//         [95,],
+//         [97,],
+//         [98,],
+//         [99,],
+//         [101,],
+//         [102,],
+//         [103,],
+//         [105,],
+//     ];
+
+
+//     // Convert Celsius to Fahrenheit
+//     temperature = Math.round((temperature * 9/5) + 32);
+//     dewpoint = Math.round((dewpoint * 9/5) + 32);
+
+//     // Convert temperatures to a multiple of 2
+//     temperature = temperature % 2 == 0 ? temperature : temperature - 1;
+//     dewpoint = dewpoint % 2 == 0 ? dewpoint : dewpoint - 1;
+
+//     // Clamp temperatures between min/max table indicies
+//     temperature = clamp(temperature, 80, 116);
+//     dewpoint = clamp(dewpoint, 10, 90);
+
+//     // Convert temperatures to array indices
+//     temperature -= 80;
+//     dewpoint -= 10
+
+//     // Return FITS
+//     if(fits_table[dewpoint][temperature] == -1) {
+//         return "Invalid";
+//     } else if (fits_table[dewpoint][temperature] < 90) {
+//         return "Norm";
+//     } else if(fits_table[dewpoint][temperature] < 100) {
+//         return "Caution";
+//     } else {
+//         return "Danger";
+//     }
+// }
+
+function clamp(value, min, max) {
+    if(value < min) {
+        return min;
+    } else if (value > max) {
+        return max;
+    } else {
+        return value;
     }
-    
-    // Rebuild NOTAMs with buttons
-    icao_list.forEach(function(icao_notam) {
-        // ICAO Title
-        const notam_title = document.createElement("p");
-        notam_title.innerText = icao_notam.split("_")[0].toUpperCase() + " NOTAMs:";
-        notam_parent_div.appendChild(notam_title);
-
-        // NOTAMs for that ICAO
-        const notams = document.getElementsByClassName(icao_notam);
-        for (let i = 0; i < notams.length; i++) {
-            // Parent div
-            const notam_div = document.createElement("div");
-            notam_parent_div.appendChild(notam_div);
-            
-            // Hide button
-            const hide_button = document.createElement("button");
-            hide_button.innerText = "Hide";
-            hide_button.className = "notam-hide hide-button";
-            hide_button.onclick = function() { hide_button.parentElement.remove(); };
-            notam_div.appendChild(hide_button);
-
-            // JS stuff to create NOTAM elements
-            const notam_id = document.createElement("div");
-            const notam_text = document.createElement("div");
-            const notam_start = document.createElement("div");
-            const notam_end = document.createElement("div"); 
-            const notam_created = document.createElement("div");
-
-            // NOTAM text
-            var notam = notams[i].innerText.replace(/[^\u0000-\u007F]/g, "'");
-            const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
-
-            for (const match of notam.matchAll(re)) {       
-                notam_id.innerText = " " + match[1];
-                notam_text.innerText = " - " + match[2];
-                notam_start.innerText = " " + match[3];
-                notam_end.innerText = " - " + match[4];
-                notam_created.innerText = " Created: " + match[5];
-            }
-            
-            notam_id.classList.add("notam_id");
-            notam_text.classList.add("notam_text");
-            notam_start.classList.add("notam_start");
-            notam_end.classList.add("notam_end");
-            notam_created.classList.add("notam_created");
-                            
-            notam_id.style.display = "inline";
-            notam_text.style.display = "inline";
-            notam_start.style.display = "inline";
-            notam_end.style.display = "inline";
-            notam_created.style.display = "inline";
-            
-            notam_div.appendChild(notam_id);
-            notam_div.appendChild(notam_text);
-            notam_div.appendChild(notam_start);
-            notam_div.appendChild(notam_end);
-            notam_div.appendChild(notam_created);
-        }
-    });
 }
-
-function rebuildWeather() {
-    const weather_parent_div = document.getElementById("weather");
-    var all_icao_string = document.getElementById("all_icaos").innerText;
-
-    // Remove whitespace and create list
-    all_icao_string = all_icao_string.replace(/\s/g, "");
-    const all_icao = all_icao_string.split(",");
-
-    all_icao.forEach(function(icao) {
-        const icao_weather_title = document.createElement("p");
-        icao_weather_title.innerText = icao.toUpperCase() + " Weather:";
-        weather_parent_div.appendChild(icao_weather_title);
-
-        const icao_metar = document.createElement("p");
-        icao_metar.innerText = document.getElementsByClassName(icao + "_metar")[0].innerText;
-        weather_parent_div.appendChild(icao_metar);
-
-        const icao_taf = document.createElement("p");
-        icao_taf.innerText = document.getElementsByClassName(icao + "_taf")[0].innerText;
-        weather_parent_div.appendChild(icao_taf);
-    });
-}
-
-function rebuildAHAS() {
-    const ahas_div = document.getElementById("birds");
-    const ahas_table = document.getElementById("ahas_table");
-    ahas_div.appendChild(ahas_table);
-}
-
-function generateTable(skip) {
-    // Get all ICAOs searched
-    var all_icao_string = document.getElementById("all_icaos").innerText;
-    all_icao_string = all_icao_string.replace(/\s/g, "");
-    const all_icao = all_icao_string.split(",");
-
-    // Create table
-    const tbl = document.createElement("table");
-    const tblBody = document.createElement("tbody");
-    const th = ["Hide", "ID", "Text", "Start", "End", "Created"];
-
-    // Create Header row
-    const header_row = document.createElement("tr");
-
-    th.forEach(function(header) {
-        const cell = document.createElement("td");
-        const cellText = document.createTextNode(header);
-        cell.className = "notam_" + header.toLowerCase();
-        cell.appendChild(cellText);
-        header_row.appendChild(cell);
-    });
-
-    tblBody.appendChild(header_row);
-
-    // Create rows for all notams
-    all_icao.forEach(function(icao) {
-        const notams = document.getElementsByClassName(icao + "_notam");
-
-        for (let i = 0; i < notams.length; i++) {
-            const tr = document.createElement("tr");
-            const notam_array = [];
-            var notam = notams[i].innerText.replace(/[^\u0000-\u007F]/g, "'");
-            const re = /(.*?) - (.*)\. (.*) UNTIL (.*)\. CREATED: (.*)/gm;
-
-            for (const match of notam.matchAll(re)) {  
-                notam_array.push(match[1], match[2], match[3], match[4], match[5])
-            }
-
-            const cell = document.createElement("td");
-            const hide_button = document.createElement("button");
-            hide_button.innerText = "Hide";
-            hide_button.onclick = function() { hide_button.parentElement.parentElement.remove(); };
-            cell.appendChild(hide_button);
-            tr.appendChild(cell);
-
-            for (let i = 0; i < notam_array.length; i++) {
-                const cell = document.createElement("td");
-                const cellText = document.createTextNode(notam_array[i]);
-                cell.className = "notam_" + th[i+1].toLowerCase();
-                cell.appendChild(cellText);
-                tr.appendChild(cell);
-            }
-            tblBody.appendChild(tr);
-        }
-    });
-
-    tbl.appendChild(tblBody);
-    document.body.appendChild(tbl);
-}
-
-document.getElementById('btnSwitch').addEventListener('click',()=>{
-    const dark_mode_switch = document.getElementById("btnSwitch");
-
-    if (dark_mode_switch.checked) {
-        document.documentElement.setAttribute('data-bs-theme','dark')
-    }
-    else {
-        document.documentElement.setAttribute('data-bs-theme','light')
-    }
-})
